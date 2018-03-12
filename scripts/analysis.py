@@ -11,6 +11,8 @@ from jicbioimage.core.image import Image
 from jicbioimage.core.transform import transformation
 from jicbioimage.core.io import AutoName, AutoWrite
 
+from segment import segment
+
 __version__ = "0.1.0"
 
 AutoName.prefix_format = "{:03d}_"
@@ -47,19 +49,20 @@ def analyse_file(fpath, output_directory):
     AutoName.directory = output_directory
 
     image = Image.from_file(fpath)
+
     image = identity(image)
+    segmentation = segment(image)
 
-
-def analyse_dataset(dataset_dir, output_dir):
+def analyse_dataset(input_uri, output_dir):
     """Analyse all the files in the dataset."""
-    dataset = DataSet.from_path(dataset_dir)
+    dataset = DataSet.from_uri(input_uri)
     logging.info("Analysing items in dataset: {}".format(dataset.name))
 
     for i in dataset.identifiers:
-        data_item_abspath = dataset.abspath_from_identifier(i)
-        item_info = dataset.item_from_identifier(i)
+        data_item_abspath = dataset.item_content_abspath(i)
+        item_info = dataset.item_properties(i)
 
-        specific_output_dir = item_output_path(output_dir, item_info["path"])
+        specific_output_dir = item_output_path(output_dir, item_info["relpath"])
         analyse_file(data_item_abspath, specific_output_dir)
 
 
