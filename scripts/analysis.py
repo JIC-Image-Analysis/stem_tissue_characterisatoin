@@ -12,6 +12,7 @@ from jicbioimage.core.transform import transformation
 from jicbioimage.core.io import AutoName, AutoWrite
 
 from segment import segment
+from annotate import generate_annotation
 
 __version__ = "0.1.0"
 
@@ -50,8 +51,17 @@ def analyse_file(fpath, output_directory):
 
     image = Image.from_file(fpath)
 
+    # Debug on smaller image
+#   image = image[2000:2500,2000:2500]
+#   image = image[1000:1500,2000:2500]
+
     image = identity(image)
     segmentation = segment(image)
+    annotation = generate_annotation(segmentation)
+
+    output_fname = os.path.join(AutoName.directory, "annotation.png")
+    with open(output_fname, "wb") as fh:
+        fh.write(annotation.png())
 
 def analyse_dataset(input_uri, output_dir):
     """Analyse all the files in the dataset."""
